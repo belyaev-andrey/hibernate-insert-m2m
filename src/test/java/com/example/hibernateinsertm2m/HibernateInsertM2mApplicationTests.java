@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 @TestPropertySource(locations = {"classpath:test-application.properties"})
 @SpringBootTest
-@Transactional
-@Commit
 class HibernateInsertM2mApplicationTests {
 
 	@Autowired
@@ -28,10 +28,23 @@ class HibernateInsertM2mApplicationTests {
 	}
 
 	@Test
-	void testInsertListOwningSide() {
+	@Transactional
+	@Rollback
+	void testAddValueToListOnOwningSide_DirectAdd() {
+		Vet vet = vetRepository.findById(1L).orElseThrow();
+		Speciality speciality = specialityRepository.findById(2L).orElseThrow();
+		vet.getSpecialities().add(speciality);
+		vetRepository.saveAndFlush(vet);
+	}
+
+	@Test
+	@Transactional
+	@Rollback
+	void testAddValueToListOnOwningSide_SyncMethod() {
 		Vet vet = vetRepository.findById(1L).orElseThrow();
 		Speciality speciality = specialityRepository.findById(2L).orElseThrow();
 		vet.addSpeciality(speciality);
+		vetRepository.saveAndFlush(vet);
 	}
 
 }
