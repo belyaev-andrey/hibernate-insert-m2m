@@ -7,10 +7,8 @@ import com.example.hibernateinsertm2m.vets.repositories.VetRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 @TestPropertySource(locations = {"classpath:test-application.properties"})
@@ -30,7 +28,7 @@ class HibernateInsertM2mApplicationTests {
 	@Test
 	@Transactional
 	@Rollback
-	void testAddValueToListOnOwningSide_DirectAdd() {
+	void testAddValueToListOnOwningSide_AddToOwning() {
 		Vet vet = vetRepository.findById(1L).orElseThrow();
 		Speciality speciality = specialityRepository.findById(2L).orElseThrow();
 		vet.getSpecialities().add(speciality);
@@ -40,11 +38,21 @@ class HibernateInsertM2mApplicationTests {
 	@Test
 	@Transactional
 	@Rollback
-	void testAddValueToListOnOwningSide_SyncMethod() {
+	void testAddValueToListOnOwningSide_AddToOwning_SyncMethod() {
 		Vet vet = vetRepository.findById(1L).orElseThrow();
 		Speciality speciality = specialityRepository.findById(2L).orElseThrow();
 		vet.addSpeciality(speciality);
 		vetRepository.saveAndFlush(vet);
+	}
+
+	@Test
+	@Transactional
+	@Rollback
+	void testAddValueToListOnOwningSide_AddToNonOwning_SyncMethod() {
+		Vet vet = vetRepository.findById(1L).orElseThrow();
+		Speciality speciality = specialityRepository.findById(2L).orElseThrow();
+		speciality.addVet(vet);
+		specialityRepository.saveAndFlush(speciality);
 	}
 
 }

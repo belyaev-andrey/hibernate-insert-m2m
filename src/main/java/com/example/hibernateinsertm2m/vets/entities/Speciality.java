@@ -42,6 +42,11 @@ public class Speciality {
         this.id = id;
     }
 
+    public void addVet(Vet vet) {
+        vets.add(vet);
+        vet.getSpecialities().add(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
